@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: jc5x/firefly-iii
-  tag: release-5.0.4
+  tag: release-5.0.5
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
