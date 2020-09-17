@@ -63,14 +63,22 @@ spec:
           volumeMounts:
             - mountPath: /var/www/firefly-iii/storage/export
               name: storage
-              subPath: export
+              subPath: {{ default "export" .Values.persistence.exportSubPath }}
             - mountPath: /var/www/firefly-iii/storage/upload
               name: storage
-              subPath: upload
+              subPath: {{ default "upload" .Values.persistence.uploadSubPath }}
       volumes:
         - name: storage
+          {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
+            {{- if  .Values.persistence.existingClaim }}
+            claimName: {{ .Values.persistence.existingClaim }}
+            {{- else }}
             claimName: {{ include "firefly-iii.fullname" . }}
+            {{- end -}}
+          {{- else }}
+          emptyDir: {}
+          {{- end -}}  
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
