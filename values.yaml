@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: fireflyiii/core
-  tag: version-5.6.2
+  tag: "{{ .Chart.AppVersion }}"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -16,14 +16,19 @@ fullnameOverride: ""
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
+  # Annotations to add to the service account
+  annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
+  # privileged: true
   # capabilities:
   #   drop:
   #   - ALL
@@ -32,12 +37,32 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  externalTrafficPolicy:
   type: ClusterIP
   port: 80
 
+probes:
+  liveness:
+    failureThreshold: 10
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 10
+  readiness:
+    failureThreshold: 10
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 10
+  startup:
+    initialDelaySeconds: 5
+    failureThreshold: 30
+    periodSeconds: 10
+
 ingress:
   enabled: false
-  annotations: {}
+  ## ingress.ingressClassName -- Support for ingress class name that was introduced in kubernetes 1.19
+  ingressClassName:
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -49,7 +74,8 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -67,31 +93,36 @@ tolerations: []
 
 affinity: {}
 
+podAnnotations: {}
+
+deploymentAnnotations: {}
+
 fireflyiii:
-  appKey: 'foo'
-  url: 'http://localhost'
+  appKey: "foo"
+  url: "http://localhost"
   login:
-    provider: ''
+    provider: ""
     ldap:
-      type: 'OpenLDAP'
-      host: 'unusedhostname'
-      port: '389'
-      basedn: 'dc=example,dc=com'
+      type: "OpenLDAP"
+      host: "unusedhostname"
+      port: "389"
+      basedn: "dc=example,dc=com"
       admin:
-        login: 'cn=admin,dc=example,dc=com'
-        password: 'password'
-      prefix: 'cn='
-      suffix: ',ou=users,dc=example,dc=com'
+        login: "cn=admin,dc=example,dc=com"
+        password: "password"
+      prefix: "cn="
+      suffix: ",ou=users,dc=example,dc=com"
 
   database:
-    type: 'pgsql'
-    host: 'postgresql'
-    port: '5432'
-    database: 'firefly-iii'
-    username: 'firefly-iii'
-    password: 'password'
+    type: "pgsql"
+    host: "postgresql"
+    port: "5432"
+    database: "firefly-iii"
+    username: "firefly-iii"
+    password: "password"
 
 persistence:
+  # persistence.enabled - Should disk persistence be enabled
   enabled: false
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -99,7 +130,10 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
+  existingClaim: ""
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
   size: 1Gi
+  ## persistence.skipuninstall -- Do not delete the pvc upon helm uninstall
+  skipuninstall: false

@@ -1,10 +1,18 @@
 {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+{{- $persistenceAnnotations := .Values.persistence.annotations }}
+{{- if .Values.persistence.skipuninstall }}
+{{- $persistenceAnnotations = merge $persistenceAnnotations (dict "helm.sh/resource-policy" "keep") }}
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{ include "firefly-iii.fullname" . }}
   labels:
 {{ include "firefly-iii.labels" . | indent 4 }}
+  {{- with $persistenceAnnotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+  {{- end }}
 spec:
   accessModes:
     {{- range .Values.persistence.accessModes }}
