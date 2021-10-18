@@ -46,7 +46,7 @@ spec:
                 port:
                   number: {{ $svcPort }}
             pathType: Prefix
-            {{- else -}}
+            {{- else }}
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}
             {{- end }}
