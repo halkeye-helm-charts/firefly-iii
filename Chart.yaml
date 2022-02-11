@@ -3,7 +3,7 @@ type: application
 appVersion: "version-5.6.2"
 description: "Firefly III: a personal finances manager"
 name: firefly-iii
-version: 1.0.2
+version: 1.0.3
 deprecated: true
 home: https://www.firefly-iii.org/
 icon: https://raw.githubusercontent.com/firefly-iii/firefly-iii/master/public/android-chrome-512x512.png
